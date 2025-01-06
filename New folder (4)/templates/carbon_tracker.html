@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">Community Carbon Footprint Tracker</h1>
+        <p class="lead text-muted">Track, reduce, and compete to lower your carbon footprint</p>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <!-- Personal Stats -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary-subtle p-3 rounded-circle me-3">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Your Impact</h5>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="text-center p-3 border rounded mb-2">
+                            <h3 class="mb-0" id="personalEmissions">0</h3>
+                            <small class="text-muted">kg CO₂e This Month</small>
+                        </div>
+                        <div class="text-center p-3 border rounded">
+                            <h3 class="mb-0" id="reductionPercentage">0%</h3>
+                            <small class="text-muted">Reduction vs Last Month</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Stats -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success-subtle p-3 rounded-circle me-3">
+                            <i class="fas fa-users text-success"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Community Impact</h5>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="text-center p-3 border rounded mb-2">
+                            <h3 class="mb-0" id="communityEmissions">0</h3>
+                            <small class="text-muted">Total kg CO₂e Saved</small>
+                        </div>
+                        <div class="text-center p-3 border rounded">
+                            <h3 class="mb-0" id="activeUsers">0</h3>
+                            <small class="text-muted">Active Members</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ranking -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-warning-subtle p-3 rounded-circle me-3">
+                            <i class="fas fa-trophy text-warning"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Your Ranking</h5>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="text-center p-3 border rounded mb-2">
+                            <h3 class="mb-0" id="userRank">0</h3>
+                            <small class="text-muted">Community Rank</small>
+                        </div>
+                        <div class="text-center p-3 border rounded">
+                            <h3 class="mb-0" id="totalUsers">0</h3>
+                            <small class="text-muted">Total Members</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Logging Section -->
+    <div class="row g-4 mb-5">
+        <!-- Log Activity Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">Log Your Activity</h4>
+                    <form id="activityForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Activity Type</label>
+                                <select class="form-select" id="activityType" required>
+                                    <option value="">Choose activity...</option>
+                                    <option value="transport">Transportation</option>
+                                    <option value="energy">Energy Usage</option>
+                                    <option value="food">Food Choices</option>
+                                    <option value="waste">Waste Management</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Specific Activity</label>
+                                <select class="form-select" id="specificActivity" required>
+                                    <option value="">Select type first...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="quantity" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Unit</label>
+                                <select class="form-select" id="unit" required>
+                                    <option value="">Choose unit...</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Log Activity
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Tips -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">Personalized Tips</h4>
+                    <div id="tipsList" class="list-group list-group-flush">
+                        <!-- Tips will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Challenges & Leaderboard -->
+    <div class="row g-4">
+        <!-- Active Challenges -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">Active Challenges</h4>
+                    <div class="challenges-grid">
+                        <!-- Challenge Cards -->
+                        <div class="challenge-card mb-3 p-3 border rounded">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle bg-info-subtle p-2 rounded-circle me-3">
+                                    <i class="fas fa-bicycle text-info"></i>
+                                </div>
+                                <h5 class="mb-0">Car-Free Week</h5>
+                                <span class="badge bg-success ms-auto">Active</span>
+                            </div>
+                            <p class="mb-2">Use public transport or bike for a week</p>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 65%"></div>
+                            </div>
+                            <small class="text-muted">156 participants</small>
+                        </div>
+
+                        <div class="challenge-card mb-3 p-3 border rounded">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle bg-success-subtle p-2 rounded-circle me-3">
+                                    <i class="fas fa-leaf text-success"></i>
+                                </div>
+                                <h5 class="mb-0">Meatless Monday</h5>
+                                <span class="badge bg-warning ms-auto">2 days left</span>
+                            </div>
+                            <p class="mb-2">Choose plant-based meals every Monday</p>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 85%"></div>
+                            </div>
+                            <small class="text-muted">243 participants</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">Top Contributors</h4>
+                    <div class="leaderboard-list">
+                        <!-- Leaderboard entries will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Details Modal -->
+<div class="modal fade" id="activityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Activity Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Activity details will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.icon-circle:hover {
+    transform: scale(1.1);
+}
+
+.stats-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.challenge-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.challenge-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
+.leaderboard-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+</style>
+
+<script>
+// Activity type options
+const activityOptions = {
+    transport: [
+        {name: 'Car Travel', units: ['kilometers', 'miles']},
+        {name: 'Bus Travel', units: ['kilometers', 'miles']},
+        {name: 'Train Travel', units: ['kilometers', 'miles']},
+        {name: 'Air Travel', units: ['kilometers', 'miles']}
+    ],
+    energy: [
+        {name: 'Electricity Usage', units: ['kWh']},
+        {name: 'Natural Gas', units: ['cubic meters']},
+        {name: 'Water Usage', units: ['liters']}
+    ],
+    food: [
+        {name: 'Meat Consumption', units: ['kg']},
+        {name: 'Dairy Products', units: ['kg']},
+        {name: 'Plant-based Meals', units: ['meals']}
+    ],
+    waste: [
+        {name: 'Recycling', units: ['kg']},
+        {name: 'Composting', units: ['kg']},
+        {name: 'Landfill Waste', units: ['kg']}
+    ]
+};
+
+// Update specific activity options based on activity type
+document.getElementById('activityType').addEventListener('change', function() {
+    const specificActivity = document.getElementById('specificActivity');
+    const unit = document.getElementById('unit');
+    
+    // Clear existing options
+    specificActivity.innerHTML = '<option value="">Choose activity...</option>';
+    unit.innerHTML = '<option value="">Choose unit...</option>';
+    
+    // Add new options based on selection
+    const activities = activityOptions[this.value] || [];
+    activities.forEach(activity => {
+        specificActivity.add(new Option(activity.name, activity.name.toLowerCase()));
+    });
+});
+
+// Update units based on specific activity
+document.getElementById('specificActivity').addEventListener('change', function() {
+    const activityType = document.getElementById('activityType').value;
+    const unit = document.getElementById('unit');
+    
+    // Clear existing options
+    unit.innerHTML = '<option value="">Choose unit...</option>';
+    
+    // Find selected activity
+    const activity = activityOptions[activityType].find(a => 
+        a.name.toLowerCase() === this.value
+    );
+    
+    // Add unit options
+    if (activity) {
+        activity.units.forEach(u => {
+            unit.add(new Option(u, u));
+        });
+    }
+});
+
+// Handle form submission
+document.getElementById('activityForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Get form values
+    const data = {
+        activityType: document.getElementById('activityType').value,
+        specificActivity: document.getElementById('specificActivity').value,
+        quantity: document.getElementById('quantity').value,
+        unit: document.getElementById('unit').value
+    };
+    
+    // Send to server
+    fetch('/log_activity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update stats
+            updateStats();
+            // Show success message
+            alert('Activity logged successfully!');
+            // Reset form
+            this.reset();
+        } else {
+            alert('Error logging activity: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error logging activity. Please try again.');
+    });
+});
+
+// Function to update stats
+function updateStats() {
+    fetch('/get_carbon_stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('personalEmissions').textContent = data.personal_emissions;
+            document.getElementById('reductionPercentage').textContent = data.reduction_percentage + '%';
+            document.getElementById('communityEmissions').textContent = data.community_emissions;
+            document.getElementById('activeUsers').textContent = data.active_users;
+            document.getElementById('userRank').textContent = data.user_rank;
+            document.getElementById('totalUsers').textContent = data.total_users;
+        })
+        .catch(error => console.error('Error updating stats:', error));
+}
+
+// Update stats on page load
+updateStats();
+
+// Update leaderboard
+function updateLeaderboard() {
+    fetch('/get_leaderboard')
+        .then(response => response.json())
+        .then(data => {
+            const leaderboardList = document.querySelector('.leaderboard-list');
+            leaderboardList.innerHTML = data.leaders.map((user, index) => `
+                <div class="d-flex align-items-center p-3 border-bottom">
+                    <div class="position-relative me-3">
+                        <div class="icon-circle ${index < 3 ? 'bg-warning-subtle' : 'bg-light'} p-2">
+                            <span class="fw-bold ${index < 3 ? 'text-warning' : 'text-muted'}">#${index + 1}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">${user.name}</h6>
+                        <small class="text-muted">${user.emissions} kg CO₂e saved</small>
+                    </div>
+                    <span class="badge bg-success ms-auto">${user.reduction}%</span>
+                </div>
+            `).join('');
+        })
+        .catch(error => console.error('Error updating leaderboard:', error));
+}
+
+// Update leaderboard on page load
+updateLeaderboard();
+
+// Update tips
+function updateTips() {
+    fetch('/get_personalized_tips')
+        .then(response => response.json())
+        .then(data => {
+            const tipsList = document.getElementById('tipsList');
+            tipsList.innerHTML = data.tips.map(tip => `
+                <div class="list-group-item border-0 py-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="icon-circle bg-${tip.category}-subtle p-2 rounded-circle me-3">
+                            <i class="fas ${tip.icon} text-${tip.category}"></i>
+                        </div>
+                        <h6 class="mb-0">${tip.title}</h6>
+                    </div>
+                    <p class="mb-0 text-muted small">${tip.description}</p>
+                </div>
+            `).join('');
+        })
+        .catch(error => console.error('Error updating tips:', error));
+}
+
+// Update tips on page load
+updateTips();
+
+// Refresh data periodically
+setInterval(() => {
+    updateStats();
+    updateLeaderboard();
+    updateTips();
+}, 300000); // Every 5 minutes
+</script>
+{% endblock %}

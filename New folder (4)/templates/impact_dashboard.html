@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header with Environmental Score -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-success border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="eco-score-circle">
+                                <div class="score-inner">
+                                    <h2 class="mb-0" id="ecoScore">0</h2>
+                                    <small>Eco Score</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2 class="text-white mb-1">Environmental Impact Dashboard</h2>
+                            <p class="text-white-50 mb-0">Your real-time environmental impact analysis powered by AI</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="achievement-badge" id="currentBadge">
+                                <i class="fas fa-award fa-3x text-white"></i>
+                                <span class="badge-label">Earth Guardian</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="row g-4">
+        <!-- Left Column - Impact Metrics -->
+        <div class="col-lg-8">
+            <div class="row g-4">
+                <!-- Impact Cards -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 impact-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle bg-primary-subtle p-3 me-3">
+                                    <i class="fas fa-tree text-primary"></i>
+                                </div>
+                                <h5 class="card-title mb-0">Carbon Offset</h5>
+                            </div>
+                            <div class="impact-stats">
+                                <h3 class="mb-2" id="carbonOffset">0</h3>
+                                <p class="text-muted mb-0">kg CO₂ equivalent</p>
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 impact-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle bg-success-subtle p-3 me-3">
+                                    <i class="fas fa-recycle text-success"></i>
+                                </div>
+                                <h5 class="card-title mb-0">Waste Reduction</h5>
+                            </div>
+                            <div class="impact-stats">
+                                <h3 class="mb-2" id="wasteReduction">0</h3>
+                                <p class="text-muted mb-0">kg waste diverted</p>
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impact Timeline -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Impact Timeline</h5>
+                            <div class="timeline" id="impactTimeline">
+                                <!-- Timeline items will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="card-title mb-0">AI Environmental Insights</h5>
+                                <span class="badge bg-primary-subtle text-primary">Powered by Gemini</span>
+                            </div>
+                            <div id="aiInsights" class="insights-container">
+                                <!-- AI insights will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Achievements & Challenges -->
+        <div class="col-lg-4">
+            <!-- Achievement Progress -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Achievement Progress</h5>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <!-- Achievement items will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Challenges -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Active Challenges</h5>
+                    <div class="challenges-list" id="challengesList">
+                        <!-- Challenge items will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Impact -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Community Impact</h5>
+                    <div class="community-stats">
+                        <div class="stat-item mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Global Rank</span>
+                                <span class="text-primary" id="globalRank">#0</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Community Contribution</span>
+                                <span class="text-success" id="communityContribution">0%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Styling */
+.eco-score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.eco-score-circle::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.score-inner {
+    text-align: center;
+    color: white;
+}
+
+.score-inner h2 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0;
+}
+
+.score-inner small {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.achievement-badge {
+    text-align: center;
+    position: relative;
+}
+
+.badge-label {
+    display: block;
+    color: white;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.impact-card {
+    transition: transform 0.3s ease;
+}
+
+.impact-card:hover {
+    transform: translateY(-5px);
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline {
+    position: relative;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 2rem;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0d6efd;
+}
+
+.insights-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.insight-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+    margin-bottom: 1rem;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.achievement-item {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+    transition: transform 0.3s ease;
+}
+
+.achievement-item:hover {
+    transform: scale(1.05);
+}
+
+.challenges-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.challenge-item {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+    margin-bottom: 1rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+</style>
+
+<script>
+// Initialize the dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch and update all dashboard data
+    updateDashboard();
+    
+    // Set up periodic updates
+    setInterval(updateDashboard, 300000); // Update every 5 minutes
+});
+
+function updateDashboard() {
+    // Fetch dashboard data
+    fetch('/get_dashboard_data')
+        .then(response => response.json())
+        .then(data => {
+            // Update eco score with animation
+            animateNumber('ecoScore', data.eco_score);
+            
+            // Update impact metrics
+            animateNumber('carbonOffset', data.carbon_offset);
+            animateNumber('wasteReduction', data.waste_reduction);
+            
+            // Update progress bars
+            updateProgressBars(data.progress);
+            
+            // Update timeline
+            updateTimeline(data.timeline);
+            
+            // Update AI insights
+            updateInsights(data.insights);
+            
+            // Update achievements
+            updateAchievements(data.achievements);
+            
+            // Update challenges
+            updateChallenges(data.challenges);
+            
+            // Update community stats
+            updateCommunityStats(data.community);
+        })
+        .catch(error => console.error('Error updating dashboard:', error));
+}
+
+function animateNumber(elementId, target) {
+    const element = document.getElementById(elementId);
+    const start = parseInt(element.textContent);
+    const duration = 1000;
+    const steps = 60;
+    const increment = (target - start) / steps;
+    
+    let current = start;
+    const timer = setInterval(() => {
+        current += increment;
+        element.textContent = Math.round(current);
+        
+        if ((increment > 0 && current >= target) || 
+            (increment < 0 && current <= target)) {
+            element.textContent = target;
+            clearInterval(timer);
+        }
+    }, duration / steps);
+}
+
+function updateProgressBars(progress) {
+    Object.entries(progress).forEach(([id, value]) => {
+        const progressBar = document.querySelector(`#${id} .progress-bar`);
+        if (progressBar) {
+            progressBar.style.width = `${value}%`;
+        }
+    });
+}
+
+function updateTimeline(timeline) {
+    const container = document.getElementById('impactTimeline');
+    container.innerHTML = timeline.map(item => `
+        <div class="timeline-item">
+            <div class="d-flex justify-content-between">
+                <h6 class="mb-1">${item.title}</h6>
+                <small class="text-muted">${item.date}</small>
+            </div>
+            <p class="mb-0 text-muted">${item.description}</p>
+        </div>
+    `).join('');
+}
+
+function updateInsights(insights) {
+    const container = document.getElementById('aiInsights');
+    container.innerHTML = insights.map(insight => `
+        <div class="insight-card">
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas ${insight.icon} text-primary me-2"></i>
+                <h6 class="mb-0">${insight.title}</h6>
+            </div>
+            <p class="mb-0 text-muted">${insight.description}</p>
+        </div>
+    `).join('');
+}
+
+function updateAchievements(achievements) {
+    const container = document.getElementById('achievementsGrid');
+    container.innerHTML = achievements.map(achievement => `
+        <div class="achievement-item">
+            <i class="fas ${achievement.icon} fa-2x mb-2 ${achievement.unlocked ? 'text-primary' : 'text-muted'}"></i>
+            <h6 class="mb-1">${achievement.title}</h6>
+            <small class="text-muted">${achievement.progress}%</small>
+            <div class="progress mt-2" style="height: 4px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: ${achievement.progress}%"></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateChallenges(challenges) {
+    const container = document.getElementById('challengesList');
+    container.innerHTML = challenges.map(challenge => `
+        <div class="challenge-item">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">${challenge.title}</h6>
+                <span class="badge ${challenge.active ? 'bg-success' : 'bg-warning'}">${challenge.status}</span>
+            </div>
+            <p class="mb-2 text-muted small">${challenge.description}</p>
+            <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: ${challenge.progress}%"></div>
+            </div>
+            <small class="text-muted">${challenge.participants} participants</small>
+        </div>
+    `).join('');
+}
+
+function updateCommunityStats(community) {
+    document.getElementById('globalRank').textContent = `#${community.rank}`;
+    document.getElementById('communityContribution').textContent = `${community.contribution}%`;
+    
+    // Update progress bars
+    document.querySelector('.community-stats .progress-bar:first-child').style.width = `${community.rank_percentile}%`;
+    document.querySelector('.community-stats .progress-bar:last-child').style.width = `${community.contribution}%`;
+}
+</script>
+{% endblock %}

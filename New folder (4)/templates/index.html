@@ -1,0 +1,645 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Energy Monitor{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        --primary-color: #00c853;
+        --secondary-color: #2962ff;
+        --warning-color: #ff3d00;
+        --background-color: #f5f6fa;
+        --card-bg: rgba(255, 255, 255, 0.9);
+        --text-primary: #2c3e50;
+        --text-secondary: #34495e;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        color: var(--text-primary);
+    }
+    
+    .dashboard-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 25px;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(31, 38, 135, 0.25);
+    }
+    
+    .metric-value {
+        font-size: 2.8em;
+        font-weight: 700;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 10px 0;
+    }
+    
+    .metric-label {
+        color: var(--text-secondary);
+        font-size: 1em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 350px;
+        margin: 20px 0;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3);
+    }
+    
+    .reading-form {
+        background: var(--card-bg);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(0, 200, 83, 0.25);
+    }
+    
+    .appliance-icon {
+        font-size: 2em;
+        margin-right: 15px;
+        color: var(--primary-color);
+    }
+    
+    .readings-table {
+        margin-top: 20px;
+    }
+    
+    .readings-table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 1px;
+    }
+    
+    .readings-table td {
+        vertical-align: middle;
+        padding: 15px 12px;
+    }
+    
+    .usage-trend {
+        font-size: 0.9em;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    
+    .trend-up {
+        background-color: rgba(255, 61, 0, 0.1);
+        color: var(--warning-color);
+    }
+    
+    .trend-down {
+        background-color: rgba(0, 200, 83, 0.1);
+        color: var(--primary-color);
+    }
+    
+    .header-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .header-section h1 {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .header-section p {
+        color: var(--text-secondary);
+        font-size: 1.1em;
+    }
+
+    .navbar {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+        font-weight: bold;
+        color: white !important;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: rgba(255,255,255,0.9) !important;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: white !important;
+        transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        color: white !important;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .highlight {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-leaf me-2"></i>
+                EcoSmart Platform
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item mx-2">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-bolt me-1"></i>
+                            Energy Monitor
+                        </a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link" href="/food_waste">
+                            <i class="fas fa-utensils me-1"></i>
+                            Food Waste
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="header-section">
+            <h1>Smart Energy Monitor</h1>
+            <p>World-Class Energy Management</p>
+        </div>
+        
+        <!-- Reading Input Form -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="reading-form">
+                    <h4 class="mb-4">
+                        <i class="fas fa-bolt text-warning"></i>
+                        Add Energy Reading
+                    </h4>
+                    <form id="readingForm">
+                        <div class="mb-3">
+                            <label for="applianceType" class="form-label">Select Appliance</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-plug"></i>
+                                </span>
+                                <select class="form-select" id="applianceType" required onchange="updateUsageHelper()">
+                                    <option value="">Choose...</option>
+                                </select>
+                            </div>
+                            <div class="form-text text-muted" id="usageGuide">
+                                Select an appliance to see typical usage range
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="usageAmount" class="form-label">Energy Usage (kWh)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-bolt"></i>
+                                </span>
+                                <input type="number" class="form-control" id="usageAmount" step="0.01" min="0" required>
+                                <span class="input-group-text">kWh</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Add Reading
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="dashboard-card">
+                    <h4 class="mb-4">
+                        <i class="fas fa-chart-line text-primary"></i>
+                        Energy Usage Trends
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="usageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <div class="metric-label">Current Usage</div>
+                    <div class="metric-value" id="currentUsage">0.0</div>
+                    <div class="usage-trend trend-down">
+                        <i class="fas fa-arrow-down"></i>
+                        5% vs Last Hour
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <div class="metric-label">Today's Cost</div>
+                    <div class="metric-value" id="todayCost">$0.00</div>
+                    <div class="usage-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        $1.20 vs Yesterday
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <div class="metric-label">Peak Hour</div>
+                    <div class="metric-value" id="peakHour">2 PM</div>
+                    <div class="text-muted">Highest Usage Time</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card highlight">
+                    <div class="metric-label">Predicted Usage</div>
+                    <div class="metric-value" id="predictedUsage">1.2</div>
+                    <div class="text-success">
+                        <i class="fas fa-check-circle"></i>
+                        95% Confidence
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Readings Table -->
+        <div class="dashboard-card">
+            <h4 class="mb-4">
+                <i class="fas fa-history text-primary"></i>
+                Recent Readings
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-hover readings-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Appliance</th>
+                            <th>Usage (kWh)</th>
+                            <th>Cost</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="readingsTableBody">
+                        <!-- Readings will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="dashboard-card">
+                    <h4 class="mb-4">
+                        <i class="fas fa-lightbulb text-warning"></i>
+                        Energy Saving Tips
+                    </h4>
+                    <div id="recommendationsContainer">
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Turn off lights when leaving rooms
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Use natural light during daytime
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Set AC temperature to 24°C for optimal efficiency
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="dashboard-card">
+                    <h4 class="mb-4">
+                        <i class="fas fa-piggy-bank text-success"></i>
+                        Potential Savings
+                    </h4>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6>Monthly</h6>
+                            <h4 class="text-success" id="monthlySavings">$45.00</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Yearly</h6>
+                            <h4 class="text-success" id="yearlySavings">$540.00</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>CO₂ Reduction</h6>
+                            <h4 class="text-success" id="co2Savings">250 kg</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+
+<script>
+    let usageChart;
+    let applianceRanges = {};
+    
+    // Fetch appliance ranges when page loads
+    fetch('/get_appliance_ranges')
+        .then(response => response.json())
+        .then(data => {
+            applianceRanges = data;
+            populateApplianceDropdown(data);
+        })
+        .catch(error => console.error('Error fetching appliance ranges:', error));
+    
+    // Populate appliance dropdown with icons
+    function populateApplianceDropdown(appliances) {
+        const dropdown = document.getElementById('applianceType');
+        dropdown.innerHTML = '<option value="">Select Appliance</option>';
+        
+        Object.entries(appliances).forEach(([name, data]) => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.innerHTML = `<i class="fas fa-${data.icon}"></i> ${name}`;
+            dropdown.appendChild(option);
+        });
+    }
+    
+    function updateUsageHelper() {
+        const appliance = document.getElementById('applianceType').value;
+        const helperText = document.getElementById('usageGuide');
+        
+        if (appliance && applianceRanges[appliance]) {
+            const range = applianceRanges[appliance].ranges;
+            helperText.innerHTML = `Typical usage: ${range.min} - ${range.max} kWh (usually around ${range.typical} kWh)`;
+            helperText.classList.remove('text-danger');
+            helperText.classList.add('text-muted');
+        } else {
+            helperText.innerHTML = 'Please select an appliance';
+            helperText.classList.remove('text-muted');
+            helperText.classList.add('text-danger');
+        }
+    }
+
+    // Initialize usage chart
+    function initializeChart() {
+        const ctx = document.getElementById('usageChart').getContext('2d');
+        usageChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Energy Usage (kWh)',
+                    data: [],
+                    borderColor: '#00c853',
+                    backgroundColor: 'rgba(0, 200, 83, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' kWh';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Update dashboard with latest data
+    function updateDashboard() {
+        fetch('/get_usage_data')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Update chart
+                if (data.chart_data && Array.isArray(data.chart_data.labels)) {
+                    usageChart.data.labels = data.chart_data.labels;
+                    usageChart.data.datasets[0].data = data.chart_data.values;
+                    usageChart.update();
+                }
+
+                // Update metrics
+                if (data.metrics) {
+                    document.getElementById('currentUsage').textContent = 
+                        data.metrics.current_usage.toFixed(2);
+                    document.getElementById('todayCost').textContent = 
+                        `$${data.metrics.total_cost.toFixed(2)}`;
+                    document.getElementById('peakHour').textContent = 
+                        data.metrics.peak_hour;
+                    document.getElementById('predictedUsage').textContent = 
+                        data.metrics.predicted_usage.toFixed(2);
+                }
+
+                // Update readings table
+                if (data.recent_readings && Array.isArray(data.recent_readings)) {
+                    const tbody = document.getElementById('readingsTableBody');
+                    tbody.innerHTML = '';
+                    
+                    data.recent_readings.forEach(reading => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clock me-2 text-muted"></i>
+                                    ${reading.timestamp}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-${applianceRanges[reading.appliance]?.icon || 'plug'} me-2 text-primary"></i>
+                                    ${reading.appliance}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-bolt me-2 text-warning"></i>
+                                    ${parseFloat(reading.usage).toFixed(2)} kWh
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-dollar-sign me-2 text-success"></i>
+                                    $${parseFloat(reading.cost).toFixed(2)}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="usage-trend ${reading.trend === 'up' ? 'trend-up' : 'trend-down'}">
+                                    <i class="fas fa-arrow-${reading.trend}"></i>
+                                    ${reading.trend === 'up' ? 'Higher' : 'Lower'}
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error updating dashboard:', error);
+                showNotification('Error updating dashboard: ' + error.message, 'error');
+            });
+    }
+
+    // Add reading to database
+    document.getElementById('readingForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const appliance = document.getElementById('applianceType').value;
+        const usage = parseFloat(document.getElementById('usageAmount').value);
+
+        fetch('/add_usage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                appliance: appliance,
+                usage: usage
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                this.reset();
+                showNotification('Reading added successfully!', 'success');
+                updateDashboard(); // Update the dashboard immediately
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error adding reading', 'error');
+        });
+    });
+
+    // Show notification
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} notification`;
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '1000';
+        notification.style.padding = '15px 25px';
+        notification.style.borderRadius = '10px';
+        notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        notification.innerHTML = message;
+        
+        document.body.appendChild(notification);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeChart();
+        updateDashboard();
+        
+        // Refresh dashboard every 5 minutes
+        setInterval(updateDashboard, 300000);
+    });
+</script>
+{% endblock %}
